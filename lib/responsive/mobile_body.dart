@@ -3,7 +3,6 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import '../constant.dart';
 import '../multimedia/multimedia.dart';
-
 import '../note_package/notes_page.dart';
 import '../pdf_package/book_gallery.dart';
 
@@ -18,8 +17,6 @@ class MobileBody extends StatefulWidget {
 
 class _MobileBodyState extends State<MobileBody> {
   int index = 0;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +80,7 @@ class _MobileBodyState extends State<MobileBody> {
           inactiveColor: Colors.red,
         ),
       ],
-      backgroundColor:  const Color(0xffEEF2FF),
-     
+      backgroundColor:  const Color(0xffEEF2FF),    
       containerHeight: 60,
     );
   }

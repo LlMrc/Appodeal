@@ -51,7 +51,7 @@ class _TableteBodyState extends State<TableteBody> {
                   const IconThemeData(color: Colors.white, size: 30),
               extended: isExpanded,
               unselectedIconTheme: const IconThemeData(color: Colors.white38),
-              backgroundColor: const Color(0xff0F52BA),
+              backgroundColor: const Color(0xff676FA3),
               selectedIndex: index,
               onDestinationSelected: (index) =>
                   setState(() => this.index = index),

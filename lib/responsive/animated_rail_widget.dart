@@ -19,7 +19,7 @@ class AnimatedRailWidget extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: FloatingActionButton.extended(
-                backgroundColor: Colors.red,
+                backgroundColor: const Color(0xffCDDEFF),
                 isExtended: animation.status != AnimationStatus.dismissed,
                 onPressed: ()  => isExtanded(),
                 label: child!),

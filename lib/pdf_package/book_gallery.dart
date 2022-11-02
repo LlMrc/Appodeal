@@ -212,18 +212,21 @@ class _DocumentListviewState extends State<DocumentListview> {
               }
             }),
       ),
-      floatingActionButton: MaterialButton(
-        padding: const EdgeInsets.all(10),
-        minWidth: 60,
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        color: const Color(0xffCDDEFF),
-        child: Icon(Icons.folder, size: 35, color: Colors.orange.shade400),
-        onPressed: () async {
-          final file = await PDFApi.pickFile();
-          if (file == null) return;
-          openPDF(context, file);
-        },
+      floatingActionButton: Visibility(
+        visible: isPortrait ? true: false,
+        child: MaterialButton(
+          padding: const EdgeInsets.all(10),
+          minWidth: 60,
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          color: const Color(0xffCDDEFF),
+          child: Icon(Icons.folder, size: 35, color: Colors.orange.shade400),
+          onPressed: () async {
+            final file = await PDFApi.pickFile();
+            if (file == null) return;
+            openPDF(context, file);
+          },
+        ),
       ),
       resizeToAvoidBottomInset: false,
     );

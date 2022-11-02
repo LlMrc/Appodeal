@@ -1,5 +1,5 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -86,7 +86,7 @@ class _MultimrdiaState extends State<Multimedia> {
                                   style: TextStyle(
                                       shadows: [
                                         Shadow(
-                                            color: Colors.red,
+                                            color: Colors.grey,
                                             offset: Offset(1, -1))
                                       ],
                                       color: Colors.white,
@@ -105,7 +105,7 @@ class _MultimrdiaState extends State<Multimedia> {
                               child: Column(
                                 children: [
                                   Card(
-                                      color: Colors.white54,
+                                      color: Colors.white30,
                                       child: ListTile(
                                           leading: const CircleAvatar(
                                               child: Icon(
@@ -139,20 +139,23 @@ class _MultimrdiaState extends State<Multimedia> {
               ),
             ),
           ),
-          floatingActionButton: FloatingActionButton.small(
-            backgroundColor: const Color(0xffCDDEFF),
-            onPressed: () {
-              isPortrait
-                  ? showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) => buildSheet())
-                  : null;
-            },
-            child: const Icon(
-              Icons.music_note_outlined,
-              color: Colors.black,
+          floatingActionButton: Visibility(
+            visible: isPortrait? true: false,
+            child: FloatingActionButton.small(
+              backgroundColor: const Color(0xffCDDEFF),
+              onPressed: () {
+                isPortrait
+                    ? showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => buildSheet())
+                    : null;
+              },
+              child: const Icon(
+                Icons.music_note_outlined,
+                color: Colors.black,
+              ),
             ),
           )),
     );

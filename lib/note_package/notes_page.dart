@@ -19,15 +19,13 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-  @override
-  void initState() {
-  
-    super.initState();
-  }
+ 
 
   
   @override
   Widget build(BuildContext context) {
+     final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
   statusBarColor: Color(0xffFF5959)));
     return SafeArea(
@@ -74,14 +72,17 @@ class _NotesPageState extends State<NotesPage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: const Color(0xffCDDEFF),
-          onPressed: () async {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const AddNote()));
-          },
-          label: const Text('Add', style: TextStyle(color: Colors.black),),
-          icon: const Icon(Icons.add, color: Colors.black),
+        floatingActionButton: Visibility(
+          visible: isPortrait ? true: false ,
+          child: FloatingActionButton.extended(
+            backgroundColor: const Color(0xffCDDEFF),
+            onPressed: () async {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const AddNote()));
+            },
+            label: const Text('Add', style: TextStyle(color: Colors.black),),
+            icon: const Icon(Icons.add, color: Colors.black),
+          ),
         ),
       ),
     );
