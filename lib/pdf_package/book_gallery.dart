@@ -5,13 +5,14 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:odessa/constant.dart';
-import 'package:odessa/data/datahelper.dart';
 import 'package:odessa/pdf_package/thumbnails.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:stack_appodeal_flutter/stack_appodeal_flutter.dart';
-
 import '../api/pdf_api.dart';
+import '../multimedia/page_manager.dart';
+import '../service/service.dart';
 import 'browser.dart';
 import 'favorite_pdf.dart';
 
@@ -35,15 +36,17 @@ class _DocumentListviewState extends State<DocumentListview> {
     int version = int.parse(getVersion);
     // get  storage  permission
     if (status == PermissionStatus.granted) {
-      await getPath();
-      setState(() {});
       const CircularProgressIndicator.adaptive();
+      setState(() {});
+      getIt<PageManager>().init();
+      await getPath();
     } else
     //  check Android version
     if (version > 30) {
       if (status1 == PermissionStatus.granted) {
-        await getPath();
         setState(() {});
+        getIt<PageManager>().init();
+        await getPath();
       } else if (status1 == PermissionStatus.denied) {
         setState(() => alertDialog(status1));
       }
@@ -53,9 +56,9 @@ class _DocumentListviewState extends State<DocumentListview> {
   }
 
   ///           ***get directory by VERSION***
-  bool isDir = true;
-
-  void isDirectory() async {
+bool isDir = true;
+void isDirectory() async {
+    
     String getVersion = await getPhoneVersion();
     int version = int.parse(getVersion);
     if (version >= 30) {
@@ -63,6 +66,7 @@ class _DocumentListviewState extends State<DocumentListview> {
     } else {
       setState(() => isDir = false);
     }
+
   }
 
   @override
@@ -92,7 +96,7 @@ class _DocumentListviewState extends State<DocumentListview> {
   }
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  void reload(){
+  void reload() {
     setState(() => print('reload'));
   }
 
@@ -102,55 +106,51 @@ class _DocumentListviewState extends State<DocumentListview> {
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Scaffold(
- 
       appBar: AppBar(
-     backgroundColor: Colors.transparent,
-     
-     elevation: 0.0,
-        leading: 
-       
-        IconButton(icon:  const FaIcon(
-            FontAwesomeIcons.globe,
-            size: 20,
-            color: Color(0xffCDDEFF),
-        ),
-         onPressed: (){
-           Navigator.of(context).push(MaterialPageRoute(builder: (_) => const Browser()));
-        }),
-        
-         
-      
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        leading: IconButton(
+            icon: const FaIcon(
+              FontAwesomeIcons.globe,
+              size: 20,
+              color: Color(0xffCDDEFF),
+            ),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const Browser()));
+            }),
         actions: [
-          IconButton(onPressed: (){
-             Navigator.of(context).push(MaterialPageRoute(builder: (_) =>  const FavoritePageRoute()));
-          }, 
-          icon: FaIcon(
-            FontAwesomeIcons.bookOpenReader,
-            size: 20,
-            color: isFavorite ? Colors.red :   const Color(0xffCDDEFF),
-          ),)
-          
-       
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const FavoritePageRoute()));
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.bookOpenReader,
+              size: 20,
+              color: isFavorite ? Colors.red : const Color(0xffCDDEFF),
+            ),
+          )
         ],
         centerTitle: true,
-        title: const Text('Documents', style: TextStyle(
-          letterSpacing: 2,
-          color: Colors.white),),
+        title: const Text(
+          'Documents',
+          style: TextStyle(letterSpacing: 2, color: Colors.white),
+        ),
       ),
-     
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-                    color: Color(0xffEEF2FF),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(14),
-                        topRight: Radius.circular(14))),
+            color: Color(0xffEEF2FF),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14), topRight: Radius.circular(14))),
         child: FutureBuilder<List<File>>(
             future: getPath(),
             builder: (context, AsyncSnapshot<List<File>> snapshot) {
               var data = snapshot.data;
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator.adaptive());
+                return  Center(
+                    child: LottieBuilder.asset('assets/book_search.json'));
               } else if (data == null) {
                 return Center(child: widgetRequest());
               } else if (data.isEmpty) {
@@ -168,7 +168,7 @@ class _DocumentListviewState extends State<DocumentListview> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                ' The app need  stockage 🗝access to display local PDF files'
+                                'The app need  stockage 🗝access to display local PDF files'
                                     .toUpperCase(),
                                 textAlign: TextAlign.center,
                                 selectionColor: Colors.red,
@@ -180,10 +180,10 @@ class _DocumentListviewState extends State<DocumentListview> {
                               children: [
                                 ElevatedButton(
                                     onPressed: () {},
-                                    child: Text('deny'.toUpperCase())),
+                                    child: Text('Deny'.toUpperCase())),
                                 ElevatedButton(
                                     onPressed: () => checkStoragePermission(),
-                                    child: Text('allow'.toUpperCase())),
+                                    child: Text('Allow'.toUpperCase())),
                               ],
                             )
                           ]),
@@ -195,40 +195,45 @@ class _DocumentListviewState extends State<DocumentListview> {
                   padding: const EdgeInsets.all(8.0),
                   child: GridView.builder(
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: isPortrait ? 2 : 4,
-                      ),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            childAspectRatio: 3 / 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20),
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, int index) {
                         File fileIndex = snapshot.data![index];
-      
+
                         return GestureDetector(
                             onTap: () {
                               openPDF(context, fileIndex);
                             },
-                            child: Thumbnails(file: fileIndex, reload:reload));
+                            child: Thumbnails(file: fileIndex, reload: reload));
                       }),
                 );
               }
             }),
       ),
       floatingActionButton: Visibility(
-        visible: isPortrait ? true: false,
+        visible: isPortrait ? true : false,
         child: MaterialButton(
           padding: const EdgeInsets.all(10),
           minWidth: 60,
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           color: const Color(0xffCDDEFF),
           child: Icon(Icons.folder, size: 35, color: Colors.orange.shade400),
           onPressed: () async {
             final file = await PDFApi.pickFile();
             if (file == null) return;
+            if (mounted) return;
             openPDF(context, file);
           },
         ),
       ),
       resizeToAvoidBottomInset: false,
+      extendBody: true,
     );
   }
 
@@ -264,18 +269,17 @@ class _DocumentListviewState extends State<DocumentListview> {
   }
 
   Future<void> _initialization() async {
-    //   Appodeal.setTesting(kReleaseMode ? false : true); //only not release mode
+    Appodeal.setTesting(kReleaseMode ? false : true); //only not release mode
     Appodeal.setLogLevel(Appodeal.LogLevelVerbose);
-
     Appodeal.setUseSafeArea(true);
-
     Appodeal.initialize(
-        appKey: '8b21b8606550d515198910842f2e66ca937238a3a16bf001',
+        appKey: '837969da44d4a21ea2fecf7a907907e302d0e896a536bb55',
         adTypes: [
           AppodealAdType.Banner,
         ],
         onInitializationFinished: (errors) {
           errors?.forEach((error) => print(error.desctiption));
+
           if (kDebugMode) {
             print("onInitializationFinished: errors - ${errors?.length ?? 0}");
           }

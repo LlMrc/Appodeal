@@ -25,6 +25,13 @@ class _EditNoteState extends State<EditNote> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    descController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool _isLandScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
@@ -62,8 +69,7 @@ class _EditNoteState extends State<EditNote> {
               ),
             ),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               height: 700,
               child: Column(children: [
                 const SizedBox(
@@ -74,8 +80,7 @@ class _EditNoteState extends State<EditNote> {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: TextField(
                     maxLines: 1,
-                    style:
-                        const TextStyle(color: Colors.white60, fontSize: 18),
+                    style: const TextStyle(color: Colors.white60, fontSize: 18),
                     controller: titleController,
                   ),
                 ),
@@ -85,8 +90,7 @@ class _EditNoteState extends State<EditNote> {
                   child: TextField(
                     maxLines: 16,
                     cursorColor: Colors.amber[200],
-                    style:
-                        const TextStyle(color: Colors.white60, fontSize: 16),
+                    style: const TextStyle(color: Colors.white60, fontSize: 16),
                     controller: descController,
                   ),
                 ),
@@ -97,6 +101,4 @@ class _EditNoteState extends State<EditNote> {
       ),
     );
   }
-  
- 
 }

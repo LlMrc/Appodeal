@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:odessa/pdf_package/pdf_viewer.dart';
 
-double smallScreen = 400;
+double smallScreen = 480;
 
 bool isSmallScreen(BuildContext context) {
   return MediaQuery.of(context).size.width < smallScreen;

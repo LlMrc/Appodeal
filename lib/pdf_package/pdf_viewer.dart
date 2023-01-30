@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:pdf_render/pdf_render.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
@@ -26,6 +28,8 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
+  bool isVisible = false;
+
   @override
   void initState() {
     Wakelock.enable();
@@ -35,41 +39,58 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   @override
   void dispose() {
     Wakelock.disable();
+    controller.dispose();
     super.dispose();
   }
 
   final controller = PdfViewerController();
-
+  Axis direction = Axis.vertical;
+  bool changeAxis = true;
   @override
   Widget build(BuildContext context) {
     Wakelock.enable();
-    final bool isLandScap =
+    bool isLandScap =
         MediaQuery.of(context).orientation == Orientation.landscape;
+
     final name = basenameWithoutExtension(widget.file.path);
-    
+
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             Visibility(
               visible: isLandScap ? false : true,
               child: AppBar(
-                elevation: 1.0,
-                backgroundColor: Colors.grey[400],
+                elevation: 2.0,
+                backgroundColor: Colors.grey,
+                leading: IconButton(
+                    onPressed: () {
+                      controller.setZoomRatio(zoomRatio: 2.0);
+                    },
+                    icon: const Icon(FontAwesomeIcons.magnifyingGlass,
+                        color: Color(0xff676FA3))),
                 actions: [
                   IconButton(
-                      onPressed: () {
-                        controller.setZoomRatio(zoomRatio: 2.0);
-                      },
-                      icon:
-                          const Icon(Icons.zoom_in, color: Color(0xff676FA3))),
+                    color: const Color(0xff676FA3),
+                    icon: changeAxis
+                        ? const Icon(Icons.stay_primary_portrait)
+                        : const Icon(Icons.stay_current_landscape),
+                    onPressed: () {
+                      setState(() => changeAxis = !changeAxis);
+                      if (changeAxis == true) {
+                        setState(() => direction = Axis.horizontal);
+                      } else {
+                        setState(() => direction = Axis.vertical);
+                      }
+                    },
+                  ),
                 ],
-             
                 title: Text(
                   name,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: TextStyle(),
+                  style: const TextStyle(),
                 ),
                 centerTitle: true,
               ),
@@ -78,9 +99,16 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
                 child: PdfViewer.openFile(
               widget.file.path,
               viewerController: controller,
-              params: const PdfViewerParams(
-                  pageDecoration: BoxDecoration(color: Color(0xffEEF2FF)),
-                  padding: 0.0),
+              params: PdfViewerParams(
+              
+                  scrollDirection: direction,
+                  pageDecoration:  BoxDecoration(            
+                    border: Border.all(
+                      color: Colors.grey.shade400
+                    ),
+                   color: const Color(0xffEEF2FF)
+                  ),
+                  padding: 4.0),
             )),
           ],
         ),

@@ -16,6 +16,13 @@ class AddNoteState extends State<AddNote> {
   var descController = TextEditingController();
 
   @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    descController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool _isLandScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
@@ -44,23 +51,29 @@ class AddNoteState extends State<AddNote> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xffCDDEFF),
+                            backgroundColor: const Color(0xffCDDEFF),
                             elevation: 4,
                             fixedSize: const Size(70, 5),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20))),
                         onPressed: () async {
-                          addNoteToBox(
-                              titleController.text, descController.text);
                           if (titleController.text.isEmpty) {
-                            return;
+                            titleController.text = "No Title";
+                          } else if (descController.text.isEmpty) {
+                            descController.text = 'No Notes Found!';
                           }
-
+                          await addNoteToBox(
+                              titleController.text, descController.text);
                           titleController.clear();
                           descController.clear();
+
+                          if (!mounted) return;
                           Navigator.of(context).pop();
                         },
-                        child: Text("Save".toUpperCase(), style: const TextStyle(color: Color(0xff676FA3)),)),
+                        child: Text(
+                          "Save".toUpperCase(),
+                          style: const TextStyle(color: Color(0xff676FA3)),
+                        )),
                   )
                 ],
               ),

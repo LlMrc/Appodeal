@@ -3,13 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:odessa/note_package/sticky_note.dart';
 
 import '../data/box.dart';
 import '../data/datahelper.dart';
 import 'add_note.dart';
 import 'display_note.dart';
-
 
 class NotesPage extends StatefulWidget {
   const NotesPage({Key? key}) : super(key: key);
@@ -19,18 +19,14 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
- 
-
-  
   @override
   Widget build(BuildContext context) {
-     final isPortrait =
+    final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-  statusBarColor: Color(0xffFF5959)));
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Color(0xffFF5959)));
     return SafeArea(
       child: Scaffold(
-   
         body: Column(
           children: [
             const SizedBox(
@@ -38,8 +34,9 @@ class _NotesPageState extends State<NotesPage> {
                 child: Center(
                     child: Text('S T I C K Y  N O T E S',
                         style: TextStyle(
-                          letterSpacing: 2,
-                          fontSize: 16, color: Colors.white)))),
+                            letterSpacing: 2,
+                            fontSize: 16,
+                            color: Colors.white)))),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.only(top: 8, left: 10, right: 10),
@@ -49,17 +46,21 @@ class _NotesPageState extends State<NotesPage> {
                         topLeft: Radius.circular(14),
                         topRight: Radius.circular(14))),
                 child: ValueListenableBuilder<Box<Note>>(
-                      valueListenable: NoteBoxes.getNotes().listenable(),
+                    valueListenable: NoteBoxes.getNotes().listenable(),
                     builder: (context, box, _) {
-                     final currentNote = box.values.toList().cast<Note>();
+                      final currentNote = box.values.toList().cast<Note>();
                       if (currentNote.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No Note',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2),
+                        return  Center(
+                          child: Column(
+                            children:  [
+                              LottieBuilder.asset('assets/lottie.json'),
+                              const Text(
+                                'Add Notes!',
+                                style: TextStyle(
+                                    fontSize: 18,      
+                                    letterSpacing: 2),
+                              ),
+                            ],
                           ),
                         );
                       }
@@ -73,17 +74,21 @@ class _NotesPageState extends State<NotesPage> {
           ],
         ),
         floatingActionButton: Visibility(
-          visible: isPortrait ? true: false ,
+          visible: isPortrait ? true : false,
           child: FloatingActionButton.extended(
             backgroundColor: const Color(0xffCDDEFF),
             onPressed: () async {
               Navigator.push(
                   context, MaterialPageRoute(builder: (_) => const AddNote()));
             },
-            label: const Text('Add', style: TextStyle(color: Colors.black),),
+            label: const Text(
+              'Add',
+              style: TextStyle(color: Colors.black),
+            ),
             icon: const Icon(Icons.add, color: Colors.black),
           ),
         ),
+        extendBody: true,
       ),
     );
   }
@@ -106,7 +111,8 @@ class _NotesPageState extends State<NotesPage> {
                         context,
                         MaterialPageRoute(
                             builder: (_) => DisplayNote(
-                                noteId: currentNote,)));
+                                  noteId: currentNote,
+                                )));
                   },
                   child: StickyNoteContainer(
                     color: color[index % color.length],
@@ -119,10 +125,13 @@ class _NotesPageState extends State<NotesPage> {
                   top: -10,
                   child: IconButton(
                       onPressed: () => currentNote.delete(),
-                      icon: const Icon(
+                      icon: Icon(
                         FontAwesomeIcons.thumbtack,
                         size: 14,
-                        color: Colors.blue,
+                        color: Colors.blue[800],
+                        shadows: const [
+                          Shadow(offset: Offset(-1, 0), color: Colors.white)
+                        ],
                       )))
             ],
           );
@@ -130,18 +139,14 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   List<Color> color = const [
-    Color.fromARGB(255, 246, 248, 132),
-    Color.fromARGB(255, 113, 141, 191),
-    Color.fromARGB(255, 223, 121, 121),
-    Color(0xffeee8e8),
-    Color.fromARGB(255, 89, 190, 162),
-    Color.fromARGB(255, 65, 184, 240),
-    Color.fromARGB(255, 204, 217, 132),
-    Color(0xffC8C2BC),
-    Color.fromARGB(255, 222, 124, 150),
+    Color.fromARGB(255, 219, 221, 97),
+    Color.fromARGB(255, 103, 135, 190),
+     Color.fromARGB(255, 54, 165, 133),
+    Color.fromARGB(255, 177, 89, 189),
+    Color.fromARGB(255, 128, 43, 43),  
+    Color.fromARGB(255, 44, 143, 189),
+    Color.fromARGB(255, 180, 196, 90),
+    Color.fromARGB(255, 185, 102, 19),
+    Color.fromARGB(255, 201, 95, 123),
   ];
-
- 
-
- 
 }

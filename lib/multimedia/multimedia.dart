@@ -1,14 +1,12 @@
 import 'package:audio_service/audio_service.dart';
-
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:odessa/constant.dart';
 import 'package:odessa/multimedia/page_manager.dart';
 import 'package:odessa/multimedia/player.dart';
 import 'package:stack_appodeal_flutter/stack_appodeal_flutter.dart';
 
-import '../api/buttom_package/button_class.dart';
 import '../service/service.dart';
 
 class Multimedia extends StatefulWidget {
@@ -20,21 +18,16 @@ class Multimedia extends StatefulWidget {
 }
 
 class _MultimrdiaState extends State<Multimedia> {
-  bool isAldloaded = false;
-
-  Future isInit() async {
-    bool isInitialize = await Appodeal.isInitialized(AppodealAdType.Banner);
-    if (isInitialize == true) {
-      setState(() => isAldloaded = true);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     _creatBannerAd();
-    getIt<PageManager>().init();
+ 
   }
+
+  bool isLoaded = false;
+  final pageManager = getIt<PageManager>();
+  final _audioHandler = getIt<AudioHandler>();
 
   @override
   void dispose() {
@@ -42,19 +35,15 @@ class _MultimrdiaState extends State<Multimedia> {
     Appodeal.destroy(AppodealAdType.Banner);
   }
 
-  final pageManager = getIt<PageManager>();
-  final _audioHandler = getIt<AudioHandler>();
-
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(statusBarColor: Colors.grey));
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Color(0xffFF5959)));
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey,
           body: Center(
             child: Container(
               decoration: const BoxDecoration(
@@ -70,28 +59,7 @@ class _MultimrdiaState extends State<Multimedia> {
                 children: [
                   Visibility(
                       visible: isPortrait ? true : false,
-                      child: isAldloaded
-                          ? const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: AppodealBanner(
-                                  adSize: AppodealBannerSize.BANNER,
-                                  placement: "default"))
-                              
-                          : Container(
-                              alignment: Alignment.center,
-                              height: 40,
-                              margin: const EdgeInsets.only(bottom: 6),
-                              color: Colors.white12,
-                              child: const Text('A U D I O  P L A Y E R',
-                                  style: TextStyle(
-                                      shadows: [
-                                        Shadow(
-                                            color: Colors.grey,
-                                            offset: Offset(1, -1))
-                                      ],
-                                      color: Colors.white,
-                                      letterSpacing: 2.0))),
-                                      ),
+                      child: buildContent()),
                   ValueListenableBuilder<List<String>>(
                     valueListenable: pageManager.playlistNotifier,
                     builder: (context, playlistTitles, _) {
@@ -104,29 +72,41 @@ class _MultimrdiaState extends State<Multimedia> {
                                   const EdgeInsets.symmetric(horizontal: 14),
                               child: Column(
                                 children: [
-                                  Card(
-                                      color: Colors.white30,
-                                      child: ListTile(
-                                          leading: const CircleAvatar(
-                                              child: Icon(
-                                            Icons.headphones,
-                                            color: Colors.white,
-                                          )),
-                                          title: Text(playlistTitles[index],
-                                              maxLines: 2,
-                                              overflow: TextOverflow.fade),
-                                          onTap: () async {
-                                            await _audioHandler
-                                                .skipToQueueItem(index);
-                                            _audioHandler.play();
-                                            showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                isScrollControlled: true,
-                                                context: context,
-                                                builder: (context) =>
-                                                    buildSheet());
-                                          })),
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white10,
+                                        border: Border.all(color: Colors.grey)),
+                                    child: ListTile(
+                                        leading: const CircleAvatar(
+                                            child: Icon(
+                                          Icons.headphones,
+                                          color: Colors.white,
+                                        )),
+                                        title: Text(playlistTitles[index],
+                                            maxLines: 2,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                            overflow: TextOverflow.fade),
+                                        onTap: () async {
+                                          await _audioHandler
+                                              .skipToQueueItem(index);
+
+                                          _audioHandler.play();
+                                          if (!mounted) return;
+                                          isSmallScreen(context)
+                                              ? showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  isScrollControlled: true,
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      buildSheet())
+                                              : null;
+                                        }),
+                                  ),
                                 ],
                               ),
                             );
@@ -140,7 +120,7 @@ class _MultimrdiaState extends State<Multimedia> {
             ),
           ),
           floatingActionButton: Visibility(
-            visible: isPortrait? true: false,
+            visible: isPortrait ? true : false,
             child: FloatingActionButton.small(
               backgroundColor: const Color(0xffCDDEFF),
               onPressed: () {
@@ -157,21 +137,33 @@ class _MultimrdiaState extends State<Multimedia> {
                 color: Colors.black,
               ),
             ),
-          )),
+          ),
+          extendBody: true,),
     );
+  }
+
+  void initBanner() async {
+    bool isinit = await Appodeal.isInitialized(Appodeal.BANNER);
+    if (isinit) {
+      setState(() => isLoaded = true);
+    }
   }
 
   void _creatBannerAd() {
     Appodeal.setBannerCallbacks(
-        onBannerLoaded: (isPrecache) => print('is : $isPrecache'),
+        onBannerLoaded: (isPrecache) {
+          setState(() => isLoaded = true);
+        },
         onBannerFailedToLoad: () {
-          setState(() => isAldloaded = false);
+          setState(() => isLoaded = false);
         },
         onBannerShown: () => print('onBannerShown'),
-        onBannerShowFailed: () => print('onBannerShowFailed'),
+        onBannerShowFailed: () {
+          setState(() => isLoaded = false);
+        },
         onBannerClicked: () => print('onBannerClicked'),
         onBannerExpired: () => print('onBannerExpired'));
-    isInit();
+    initBanner();
   }
 
   Widget buildSheet() => makeDissmisble(
@@ -192,4 +184,20 @@ class _MultimrdiaState extends State<Multimedia> {
           child: child,
         ),
       );
+
+  Widget buildContent() => isLoaded
+      ? const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: AppodealBanner(
+              adSize: AppodealBannerSize.BANNER, placement: "default"))
+      : Container(
+          alignment: Alignment.center,
+          height: 40,
+          margin: const EdgeInsets.only(bottom: 6),
+          color: Colors.white12,
+          child: const Text('A U D I O  P L A Y E R',
+              style: TextStyle(
+                  shadows: [Shadow(color: Colors.grey, offset: Offset(1, -1))],
+                  color: Colors.white,
+                  letterSpacing: 2.0)));
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../multimedia/multimedia.dart';
 
@@ -16,13 +15,13 @@ class TableteBody extends StatefulWidget {
 }
 
 class _TableteBodyState extends State<TableteBody> {
-   bool isExpanded = false;
+  bool isExpanded = false;
   void extendedCallBack() {
     setState(() => isExpanded = !isExpanded);
   }
 
   int index = 0;
- 
+
   final selectedColor = Colors.white;
   final unselectedColor = Colors.white38;
   final labelStyle = const TextStyle(fontWeight: FontWeight.w900, fontSize: 16);
@@ -62,26 +61,23 @@ class _TableteBodyState extends State<TableteBody> {
                     label: Text('Home')),
                 NavigationRailDestination(
                     selectedIcon: Icon(Icons.sticky_note_2),
-                    icon: Icon(Icons.sticky_note_2_outlined),
-                    label: Text('Note')),
+                    icon: Icon(FontAwesomeIcons.clipboard),
+                    label: Text('Notes')),
                 NavigationRailDestination(
-                    selectedIcon: Icon(Icons.music_note),
+                    selectedIcon: Icon(FontAwesomeIcons.music),
                     icon: Icon(Icons.music_note),
                     label: Text('Audio')),
               ],
               trailing: AnimatedRailWidget(
-                isExtanded:extendedCallBack,
+                isExtanded: extendedCallBack,
                 child: isExpanded
                     ? Row(
                         children: const [
-                          Icon(
-                            Icons.logout,
-                            color: Colors.white,
-                            size: 28,
+                          Icon(Icons.logout, color: Colors.black),
+                          SizedBox(
+                            width: 10,
                           ),
-
-                          SizedBox(width: 10,),
-                          Text('Logout')
+                          Text('Logout', style: TextStyle(color: Colors.black))
                         ],
                       )
                     : const Icon(Icons.logout),
