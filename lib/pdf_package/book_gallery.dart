@@ -1,19 +1,22 @@
 import 'dart:core';
 import 'dart:io';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lottie/lottie.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+
 import 'package:odessa/constant.dart';
 import 'package:odessa/pdf_package/thumbnails.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:stack_appodeal_flutter/stack_appodeal_flutter.dart';
+
 import '../api/pdf_api.dart';
 import '../multimedia/page_manager.dart';
 import '../service/service.dart';
-import 'browser.dart';
+
 import 'favorite_pdf.dart';
 
 class DocumentListview extends StatefulWidget {
@@ -56,9 +59,8 @@ class _DocumentListviewState extends State<DocumentListview> {
   }
 
   ///           ***get directory by VERSION***
-bool isDir = true;
-void isDirectory() async {
-    
+  bool isDir = true;
+  void isDirectory() async {
     String getVersion = await getPhoneVersion();
     int version = int.parse(getVersion);
     if (version >= 30) {
@@ -66,14 +68,20 @@ void isDirectory() async {
     } else {
       setState(() => isDir = false);
     }
-
   }
 
   @override
   void initState() {
     super.initState();
+      MobileAds.instance.initialize();
     isDirectory();
-    _initialization();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+  
   }
 
   Future<List<File>> getPath() async {
@@ -102,138 +110,100 @@ void isDirectory() async {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        leading: IconButton(
-            icon: const FaIcon(
-              FontAwesomeIcons.globe,
-              size: 20,
-              color: Color(0xffCDDEFF),
-            ),
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => const Browser()));
-            }),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const FavoritePageRoute()));
-            },
-            icon: FaIcon(
-              FontAwesomeIcons.bookOpenReader,
-              size: 20,
-              color: isFavorite ? Colors.red : const Color(0xffCDDEFF),
-            ),
-          )
-        ],
-        centerTitle: true,
-        title: const Text(
-          'Documents',
-          style: TextStyle(letterSpacing: 2, color: Colors.white),
-        ),
-      ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-            color: Color(0xffEEF2FF),
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(14), topRight: Radius.circular(14))),
-        child: FutureBuilder<List<File>>(
-            future: getPath(),
-            builder: (context, AsyncSnapshot<List<File>> snapshot) {
-              var data = snapshot.data;
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return  Center(
-                    child: LottieBuilder.asset('assets/book_search.json'));
-              } else if (data == null) {
-                return Center(child: widgetRequest());
-              } else if (data.isEmpty) {
-                return Center(
-                  child: SizedBox(
-                    height: 200,
-                    width: 320,
-                    child: Card(
-                      elevation: 4,
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            const Text('No Files found!😥',
-                                style: TextStyle(fontSize: 16)),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'The app need  stockage 🗝access to display local PDF files'
-                                    .toUpperCase(),
-                                textAlign: TextAlign.center,
-                                selectionColor: Colors.red,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ElevatedButton(
-                                    onPressed: () {},
-                                    child: Text('Deny'.toUpperCase())),
-                                ElevatedButton(
-                                    onPressed: () => checkStoragePermission(),
-                                    child: Text('Allow'.toUpperCase())),
-                              ],
-                            )
-                          ]),
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+              color: Color(0xffEEF2FF),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(14), topRight: Radius.circular(14))),
+          child: FutureBuilder<List<File>>(
+              future: getPath(),
+              builder: (context, AsyncSnapshot<List<File>> snapshot) {
+                var data = snapshot.data;
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                      child:
+                       CircularProgressIndicator());
+                } else if (data == null) {
+                  return Center(child: widgetRequest());
+                } else if (data.isEmpty) {
+                  return  Center(
+                    child: SizedBox(
+                      height: 200,
+                      width: 320,
+                      child: Card(
+                        elevation: 4,
+                        child: AnimatedTextKit(
+                         
+                            animatedTexts: [
+                              FadeAnimatedText('No Files found!😥')
+                            ]),
+                      ),
                     ),
-                  ),
-                ); //
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 3 / 2,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, int index) {
-                        File fileIndex = snapshot.data![index];
-
-                        return GestureDetector(
-                            onTap: () {
-                              openPDF(context, fileIndex);
-                            },
-                            child: Thumbnails(file: fileIndex, reload: reload));
-                      }),
-                );
-              }
-            }),
-      ),
-      floatingActionButton: Visibility(
-        visible: isPortrait ? true : false,
-        child: MaterialButton(
-          padding: const EdgeInsets.all(10),
-          minWidth: 60,
-          elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          color: const Color(0xffCDDEFF),
-          child: Icon(Icons.folder, size: 35, color: Colors.orange.shade400),
-          onPressed: () async {
-            final file = await PDFApi.pickFile();
-            if (file == null) return;
-            if (mounted) return;
-            openPDF(context, file);
-          },
+                  ); //
+                } else {
+                  return Container(
+                    height: size.height,
+                    margin:const EdgeInsets.all(8.0),
+                    child: Column(
+                  
+                      children: [
+                            const TitleBar(),
+                        Expanded(
+                          child: GridView.builder(
+                          
+                         
+                              gridDelegate:
+                                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 250,
+                                      childAspectRatio: 3 / 3,
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 20),
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, int index) {
+                                File fileIndex = snapshot.data![index];
+                            
+                                return GestureDetector(
+                                    onTap: () {
+                                      openPDF(context, fileIndex);
+                                    },
+                                    child: Thumbnails(
+                                        file: fileIndex, reload: reload));
+                              }),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }),
         ),
+        floatingActionButton: Visibility(
+          visible: isPortrait ? true : false,
+          child: MaterialButton(
+            padding: const EdgeInsets.all(10),
+            minWidth: 60,
+            elevation: 4,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            color: const Color(0xffCDDEFF),
+            child: Icon(Icons.folder, size: 35, color: Colors.orange.shade400),
+            onPressed: () async {
+              final file = await PDFApi.pickFile();
+              if (file == null) return;
+              if (mounted) return;
+              openPDF(context, file);
+            },
+          ),
+        ),
+        resizeToAvoidBottomInset: false,
+        extendBody: true,
       ),
-      resizeToAvoidBottomInset: false,
-      extendBody: true,
     );
   }
 
@@ -266,24 +236,6 @@ void isDirectory() async {
         ),
       ),
     );
-  }
-
-  Future<void> _initialization() async {
-    Appodeal.setTesting(kReleaseMode ? false : true); //only not release mode
-    Appodeal.setLogLevel(Appodeal.LogLevelVerbose);
-    Appodeal.setUseSafeArea(true);
-    Appodeal.initialize(
-        appKey: '837969da44d4a21ea2fecf7a907907e302d0e896a536bb55',
-        adTypes: [
-          AppodealAdType.Banner,
-        ],
-        onInitializationFinished: (errors) {
-          errors?.forEach((error) => print(error.desctiption));
-
-          if (kDebugMode) {
-            print("onInitializationFinished: errors - ${errors?.length ?? 0}");
-          }
-        });
   }
 
   Future<String> getPhoneVersion() async {
@@ -323,5 +275,38 @@ void isDirectory() async {
                 ));
       });
     }
+  }
+
+
+}
+
+class TitleBar extends StatelessWidget {
+  const TitleBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      height: 40,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+     
+        children: [
+                           const Text('PDF Books and Magazines', style: TextStyle(fontFamily: 'explora', fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 2)),
+                            FloatingActionButton.small(
+
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const FavoritePageRoute()));
+            },
+            child:   FaIcon(
+             FontAwesomeIcons.bookBookmark,
+              size: 20,
+              color:  Colors.grey.shade700
+            ),
+          ),
+    ]));
   }
 }

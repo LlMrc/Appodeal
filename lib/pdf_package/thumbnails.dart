@@ -26,10 +26,14 @@ class _ThumbnailsState extends State<Thumbnails> {
         header: Align(
           alignment: Alignment.topRight,
           child: PopupMenuButton(
+            shadowColor: Colors.deepPurple,
+            tooltip: 'Popup Menu Button',
+            icon: const Icon(Icons.more_vert_rounded, color: Colors.grey,),
               shape: RoundedRectangleBorder(
+                side:  BorderSide(color: Colors.grey.shade500),
                   borderRadius: BorderRadius.circular(8.0)),
               offset: const Offset(5.0, 4.0),
-              elevation: 4,
+              elevation: 8,
               color: Colors.blue[50],
               itemBuilder: (context) => [
                     PopupMenuItem(

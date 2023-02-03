@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:odessa/browser_page/wiki_page.dart';
 
 import '../multimedia/multimedia.dart';
 
 import '../note_package/notes_page.dart';
+import '../pdf_package/book_gallery.dart';
 import 'animated_rail_widget.dart';
 import 'mobile_body.dart';
 
@@ -59,9 +61,13 @@ class _TableteBodyState extends State<TableteBody> {
                     selectedIcon: Icon(Icons.apps),
                     icon: Icon(Icons.home),
                     label: Text('Home')),
+                      NavigationRailDestination(
+                    selectedIcon: Icon(FontAwesomeIcons.chrome),
+                    icon: Icon(FontAwesomeIcons.internetExplorer, size: 20,),
+                    label: Text('wikipedia')),
                 NavigationRailDestination(
                     selectedIcon: Icon(Icons.sticky_note_2),
-                    icon: Icon(FontAwesomeIcons.clipboard),
+                    icon: Icon(FontAwesomeIcons.clipboard, size: 20),
                     label: Text('Notes')),
                 NavigationRailDestination(
                     selectedIcon: Icon(FontAwesomeIcons.music),
@@ -91,10 +97,12 @@ class _TableteBodyState extends State<TableteBody> {
   Widget buildPage() {
     switch (index) {
       case 0:
-        return const MobileBody();
-      case 1:
-        return const NotesPage();
+        return const DocumentListview();
+        case 1:
+        return const MyWikiPage();
       case 2:
+        return const NotesPage();
+      case 3:
         return const Multimedia();
     }
     return const MobileBody();

@@ -1,9 +1,10 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart';
+
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:lottie/lottie.dart';
+
 import 'package:odessa/note_package/sticky_note.dart';
 
 import '../data/box.dart';
@@ -51,17 +52,25 @@ class _NotesPageState extends State<NotesPage> {
                       final currentNote = box.values.toList().cast<Note>();
                       if (currentNote.isEmpty) {
                         return  Center(
-                          child: Column(
-                            children:  [
-                              LottieBuilder.asset('assets/lottie.json'),
-                              const Text(
-                                'Add Notes!',
-                                style: TextStyle(
-                                    fontSize: 18,      
-                                    letterSpacing: 2),
+                          child: AnimatedTextKit(
+                            isRepeatingAnimation: true,
+                           
+                            animatedTexts: [
+                                FadeAnimatedText('No notes added yet',   textStyle: const TextStyle(
+                                          fontSize: 25,
+                                          letterSpacing: 2,
+                                      
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.blue)),
+                                TyperAnimatedText('Add Notes!',   textStyle: const TextStyle(
+                                          fontSize: 30,
+                                          letterSpacing: 2,
+                                       
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.blue)),
+                                
+                               ],
                               ),
-                            ],
-                          ),
                         );
                       }
                       return Padding(
