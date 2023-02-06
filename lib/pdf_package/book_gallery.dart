@@ -3,12 +3,10 @@ import 'dart:io';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-
 import 'package:odessa/constant.dart';
 import 'package:odessa/pdf_package/thumbnails.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -16,7 +14,6 @@ import 'package:permission_handler/permission_handler.dart';
 import '../api/pdf_api.dart';
 import '../multimedia/page_manager.dart';
 import '../service/service.dart';
-
 import 'favorite_pdf.dart';
 
 class DocumentListview extends StatefulWidget {
@@ -60,6 +57,7 @@ class _DocumentListviewState extends State<DocumentListview> {
 
   ///           ***get directory by VERSION***
   bool isDir = true;
+
   void isDirectory() async {
     String getVersion = await getPhoneVersion();
     int version = int.parse(getVersion);
@@ -73,15 +71,13 @@ class _DocumentListviewState extends State<DocumentListview> {
   @override
   void initState() {
     super.initState();
-      MobileAds.instance.initialize();
+    MobileAds.instance.initialize();
     isDirectory();
   }
-
 
   @override
   void dispose() {
     super.dispose();
-  
   }
 
   Future<List<File>> getPath() async {
@@ -104,12 +100,15 @@ class _DocumentListviewState extends State<DocumentListview> {
   }
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
   void reload() {
     setState(() => print('reload'));
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Color(0xffFF5959)));
     Size size = MediaQuery.of(context).size;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
@@ -127,38 +126,31 @@ class _DocumentListviewState extends State<DocumentListview> {
               builder: (context, AsyncSnapshot<List<File>> snapshot) {
                 var data = snapshot.data;
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child:
-                       CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (data == null) {
                   return Center(child: widgetRequest());
                 } else if (data.isEmpty) {
-                  return  Center(
+                  return Center(
                     child: SizedBox(
                       height: 200,
                       width: 320,
                       child: Card(
                         elevation: 4,
-                        child: AnimatedTextKit(
-                         
-                            animatedTexts: [
-                              FadeAnimatedText('No Files found!😥')
-                            ]),
+                        child: AnimatedTextKit(animatedTexts: [
+                          FadeAnimatedText('No Files found!😥')
+                        ]),
                       ),
                     ),
                   ); //
                 } else {
                   return Container(
                     height: size.height,
-                    margin:const EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.all(8.0),
                     child: Column(
-                  
                       children: [
-                            const TitleBar(),
+                        const TitleBar(),
                         Expanded(
                           child: GridView.builder(
-                          
-                         
                               gridDelegate:
                                   const SliverGridDelegateWithMaxCrossAxisExtent(
                                       maxCrossAxisExtent: 250,
@@ -168,7 +160,7 @@ class _DocumentListviewState extends State<DocumentListview> {
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, int index) {
                                 File fileIndex = snapshot.data![index];
-                            
+
                                 return GestureDetector(
                                     onTap: () {
                                       openPDF(context, fileIndex);
@@ -276,8 +268,6 @@ class _DocumentListviewState extends State<DocumentListview> {
       });
     }
   }
-
-
 }
 
 class TitleBar extends StatelessWidget {
@@ -288,25 +278,24 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(8),
-      height: 40,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-     
-        children: [
-                           const Text('PDF Books and Magazines', style: TextStyle(fontFamily: 'explora', fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 2)),
-                            FloatingActionButton.small(
-
+        margin: const EdgeInsets.all(8),
+        height: 40,
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text('PDF Books and Magazines',
+              style: TextStyle(
+                  fontFamily: 'explora',
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2)),
+          FloatingActionButton.small(
             onPressed: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const FavoritePageRoute()));
             },
-            child:   FaIcon(
-             FontAwesomeIcons.bookBookmark,
-              size: 20,
-              color:  Colors.grey.shade700
-            ),
+            child: FaIcon(FontAwesomeIcons.bookBookmark,
+                size: 20, color: Colors.grey.shade700),
           ),
-    ]));
+        ]));
   }
 }

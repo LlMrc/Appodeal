@@ -222,11 +222,24 @@ Page resource error:
 
   void _createInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: AbmobService.interstitialAdsId!,
+        adUnitId: randomId(),
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
             onAdLoaded: (InterstitialAd ad) => _interstitialAd = ad,
             onAdFailedToLoad: (LoadAdError error) => _interstitialAd = null));
+
+            
+  }
+
+   String randomId() {
+    List<String> idList = [
+    "ca-app-pub-3900780607450933/4313764460",
+      "/120940746/pub-72844-android-4898"
+       ];
+    String randomIndex =
+        (idList..shuffle()).first; //idList[Random().nextInt(idList.length)];
+    print(randomIndex);
+    return randomIndex;
   }
 
   void _showInterstitialAds() {

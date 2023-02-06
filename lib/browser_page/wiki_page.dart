@@ -7,6 +7,7 @@ import 'package:odessa/browser_page/browser.dart';
 import 'package:wikidart/wikidart.dart';
 
 import '../api/admob_service.dart';
+import '../constant.dart';
 
 class MyWikiPage extends StatefulWidget {
   const MyWikiPage({super.key});
@@ -17,17 +18,24 @@ class MyWikiPage extends StatefulWidget {
 
 class _MyWikiPageState extends State<MyWikiPage> {
   TextEditingController searchController = TextEditingController();
+  InterstitialAd? interstitialAd;
+  void initialInterstia() {
+    setState(() => isInitiated = true);
+  }
+
 
   @override
   void initState() {
     super.initState();
+
     _createInterstitialAd();
     _showInterstitialAds();
   }
 
+  
   @override
   void dispose() {
-    _interstitialAd!.dispose();
+    interstitialAd?.dispose();
     super.dispose();
   }
 
@@ -53,44 +61,49 @@ class _MyWikiPageState extends State<MyWikiPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SizedBox(
-                        width: size.width * 0.8,
-                        child: TextField(
-                          onSubmitted: (value) {
-                            setState(() => value = searchController.text);
-                          },
-                          controller: searchController,
-                          maxLines: 1,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 8),
-                            fillColor: Colors.red.shade100,
-                            labelText: 'Search',
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                color: Colors.blue,
-                                width: 2.0,
+                      Expanded(
+                        flex: 6,
+                        child: SizedBox(
+                          child: TextField(
+                            onSubmitted: (value) {
+                              setState(() => value = searchController.text);
+                            },
+                            controller: searchController,
+                            maxLines: 1,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 8),
+                              fillColor: Colors.red.shade100,
+                              labelText: 'Search',
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(
+                                  color: Colors.blue,
+                                  width: 2.0,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => const Browser()));
-                          },
-                          icon: Icon(
-                            FontAwesomeIcons.globe,
-                            color: Colors.purple.shade200,
-                          )),
+                      Expanded(
+                        flex: 1,
+                        child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) => const Browser()));
+                            },
+                            icon: Icon(
+                              FontAwesomeIcons.globe,
+                              color: Colors.purple.shade200,
+                            )),
+                      ),
                     ],
                   ),
                 ),
@@ -102,15 +115,28 @@ class _MyWikiPageState extends State<MyWikiPage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
                             child: CircularProgressIndicator.adaptive());
-                            
-                      } else if (snapshot.connectionState == ConnectionState.none) {
-                        return  Center(child: AnimatedTextKit( animatedTexts: [
-                          WavyAnimatedText('No Internet connection ⏳',textStyle: const TextStyle(color: Colors.purple,
-                          fontSize: 24))
-                        ],));
-                      }
-                      else if (snapshot.hasError) {
-                        return const Center(child: Text('An error occured'));
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.none) {
+                        return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 200),
+                              child: AnimatedTextKit(
+                                                      animatedTexts: [
+                              WavyAnimatedText('No Internet connection ⏳',
+                                  textStyle: const TextStyle(
+                                      color: Colors.purple, fontSize: 24))
+                                                      ],
+                                                    ),
+                            ));
+                      } else if (snapshot.hasError) {
+                        return Center(
+                            child: AnimatedTextKit(
+                          animatedTexts: [
+                            WavyAnimatedText('No Internet connection ⏳',
+                                textStyle: const TextStyle(
+                                    color: Colors.purple, fontSize: 24))
+                          ],
+                        ));
                       }
 
                       return Expanded(
@@ -136,17 +162,18 @@ class _MyWikiPageState extends State<MyWikiPage> {
                                       ),
                                     ),
                                     AnimatedTextKit(
-                                    isRepeatingAnimation: false,
-                                 
-                                       animatedTexts: [
-                                            TypewriterAnimatedText(  google.description ?? 'No Description',
+                                      isRepeatingAnimation: false,
+                                      animatedTexts: [
+                                        TypewriterAnimatedText(
+                                            google.description ??
+                                                'No Description',
                                             textStyle: const TextStyle(
-                                          fontSize: 25,
-                                          letterSpacing: 2,
-                                          fontFamily: 'explora',
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.blue))
-                                          ],
+                                                fontSize: 25,
+                                                letterSpacing: 2,
+                                                fontFamily: 'explora',
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.blue))
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -182,21 +209,20 @@ class _MyWikiPageState extends State<MyWikiPage> {
     return google;
   }
 
-  InterstitialAd? _interstitialAd;
-
   void _createInterstitialAd() {
+ initialInterstia();
     InterstitialAd.load(
         adUnitId: AbmobService.interstitialAdsId!,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
-            onAdLoaded: (InterstitialAd ad) => _interstitialAd = ad,
-            onAdFailedToLoad: (LoadAdError error) => _interstitialAd = null));
+            onAdLoaded: (InterstitialAd ad) => interstitialAd = ad,
+            onAdFailedToLoad: (LoadAdError error) => interstitialAd = null));
   }
 
   void _showInterstitialAds() async {
-   await Future.delayed(const Duration(seconds: 20));
-    if (_interstitialAd != null) {
-      _interstitialAd!.fullScreenContentCallback =
+    await Future.delayed(const Duration(seconds: 15));
+    if (interstitialAd != null && isInitiated == true) {
+      interstitialAd!.fullScreenContentCallback =
           FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         _createInterstitialAd();
@@ -207,8 +233,9 @@ class _MyWikiPageState extends State<MyWikiPage> {
         ad.dispose();
         _createInterstitialAd();
       });
-      _interstitialAd!.show();
-      _interstitialAd = null;
+      interstitialAd!.show();
+      interstitialAd = null;
     }
+    print("$isInitiated");
   }
 }

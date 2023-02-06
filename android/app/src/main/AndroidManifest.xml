@@ -64,6 +64,12 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+      <receiver
+        android:name="com.tappx.sdk.android.TrackInstallReceiver"
+        android:exported="true">
+      </receiver>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3900780607450933~5316254986" />

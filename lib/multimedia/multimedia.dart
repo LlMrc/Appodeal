@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -7,13 +8,13 @@ import 'package:odessa/constant.dart';
 import 'package:odessa/multimedia/page_manager.dart';
 import 'package:odessa/multimedia/player.dart';
 
-import '../api/admob_service.dart';
 import '../service/service.dart';
 
 class Multimedia extends StatefulWidget {
   const Multimedia({
     Key? key,
   }) : super(key: key);
+
   @override
   State<Multimedia> createState() => _MultimrdiaState();
 }
@@ -84,18 +85,16 @@ class _MultimrdiaState extends State<Multimedia> {
                                       )),
                                       title: Text(playlistTitles[index],
                                           maxLines: 2,
-                                        
-                                          style:  const TextStyle(
-                                            color: Colors.grey,
-                                   
-                                            fontSize: 20,
-                                           shadows: [
-                                            Shadow(color: Colors.black,
-                                           // blurRadius: 1,
-                                            
-                                            offset: Offset(1, -1))
-                                           ]
-                                          ),
+                                          style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 20,
+                                              shadows: [
+                                                Shadow(
+                                                    color: Colors.black,
+                                                    // blurRadius: 1,
+
+                                                    offset: Offset(1, -1))
+                                              ]),
                                           overflow: TextOverflow.fade),
                                       onTap: () async {
                                         await _audioHandler
@@ -153,13 +152,24 @@ class _MultimrdiaState extends State<Multimedia> {
   void _creatBannerAd() {
     _bannerAds = BannerAd(
         size: AdSize.banner,
-        adUnitId: AbmobService.bannerAdsId!,
+        adUnitId: randomId(),
         listener: BannerAdListener(
           onAdLoaded: (ad) => setState(() => isAldloaded = true),
           onAdFailedToLoad: (ad, error) => print('$ad $error'),
         ),
         request: const AdRequest())
       ..load();
+  }
+
+  String randomId() {
+    List<String> idList = [
+   "ca-app-pub-3900780607450933/3192254480",
+      "/120940746/pub-72844-android-4898"
+    ];
+    String randomIndex =
+      idList[Random().nextInt(idList.length)];
+    print(randomIndex);
+    return randomIndex;
   }
 
   Widget buildSheet() => makeDissmisble(

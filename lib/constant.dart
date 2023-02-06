@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:odessa/pdf_package/pdf_viewer.dart';
 
@@ -12,3 +12,4 @@ bool isSmallScreen(BuildContext context) {
 void openPDF(BuildContext context, File file) => Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PDFViewerPage(file: file)),
     );
+bool isInitiated = true;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:odessa/browser_page/wiki_page.dart';
 
+import '../constant.dart';
 import '../multimedia/multimedia.dart';
 
 import '../note_package/notes_page.dart';
@@ -36,7 +37,7 @@ class _TableteBodyState extends State<TableteBody> {
           NavigationRail(
               leading: Material(
                   clipBehavior: Clip.hardEdge,
-                  shape: const CircleBorder(),
+                  shape: const CircleBorder(side: BorderSide(color: Colors.white)),
                   child: InkWell(
                       onTap: () => setState(() => isExpanded = !isExpanded),
                       child: Ink.image(
@@ -48,29 +49,37 @@ class _TableteBodyState extends State<TableteBody> {
               groupAlignment: 0,
               unselectedLabelTextStyle:
                   labelStyle.copyWith(color: unselectedColor),
+                  
               selectedIconTheme:
-                  const IconThemeData(color: Colors.white, size: 30),
+                  const IconThemeData(color: Colors.grey, size: 30),
               extended: isExpanded,
-              unselectedIconTheme: const IconThemeData(color: Colors.white38),
+              unselectedIconTheme: const IconThemeData(color: Colors.white54),
               backgroundColor: const Color(0xff676FA3),
               selectedIndex: index,
               onDestinationSelected: (index) =>
-                  setState(() => this.index = index),
+                 setState(() {
+                    this.index = index;
+if (index != 1) {
+         isInitiated = false;
+          }
+        
+        }),
+                 
               destinations: const [
                 NavigationRailDestination(
-                    selectedIcon: Icon(Icons.apps),
+                    selectedIcon: Icon(Icons.apps, color: Color(0xffFF5959)),
                     icon: Icon(Icons.home),
                     label: Text('Home')),
                       NavigationRailDestination(
-                    selectedIcon: Icon(FontAwesomeIcons.chrome),
+                    selectedIcon: Icon(FontAwesomeIcons.chrome, color: Color(0xffFF5959),),
                     icon: Icon(FontAwesomeIcons.internetExplorer, size: 20,),
                     label: Text('wikipedia')),
                 NavigationRailDestination(
-                    selectedIcon: Icon(Icons.sticky_note_2),
+                    selectedIcon: Icon(Icons.sticky_note_2, color: Color(0xffFF5959)),
                     icon: Icon(FontAwesomeIcons.clipboard, size: 20),
                     label: Text('Notes')),
                 NavigationRailDestination(
-                    selectedIcon: Icon(FontAwesomeIcons.music),
+                    selectedIcon: Icon(FontAwesomeIcons.music, color: Color(0xffFF5959)),
                     icon: Icon(Icons.music_note),
                     label: Text('Audio')),
               ],
