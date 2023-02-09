@@ -40,7 +40,9 @@ class _MultimrdiaState extends State<Multimedia> {
   @override
   Widget build(BuildContext context) {
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+        MediaQuery
+            .of(context)
+            .orientation == Orientation.portrait;
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Color(0xffFF5959)));
 
@@ -67,6 +69,22 @@ class _MultimrdiaState extends State<Multimedia> {
                       child: ListView.builder(
                         itemCount: playlistTitles.length,
                         itemBuilder: (context, index) {
+                          if (playlistTitles.isEmpty) {
+                            return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 400),
+                                  child: Text("No Audio Files Found",
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w700,
+                                          shadows: const [
+                                            Shadow(
+                                                color: Colors.red,
+                                                offset: Offset(2, -1))
+                                          ],
+                                          color: Colors.grey[200])),
+                                ));
+                          }
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14),
                             child: Column(
@@ -80,9 +98,9 @@ class _MultimrdiaState extends State<Multimedia> {
                                   child: ListTile(
                                       leading: const CircleAvatar(
                                           child: Icon(
-                                        Icons.headphones,
-                                        color: Colors.black,
-                                      )),
+                                            Icons.headphones,
+                                            color: Colors.black,
+                                          )),
                                       title: Text(playlistTitles[index],
                                           maxLines: 2,
                                           style: const TextStyle(
@@ -104,12 +122,12 @@ class _MultimrdiaState extends State<Multimedia> {
                                         if (!mounted) return;
                                         isSmallScreen(context)
                                             ? showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                isScrollControlled: true,
-                                                context: context,
-                                                builder: (context) =>
-                                                    buildSheet())
+                                            backgroundColor:
+                                            Colors.transparent,
+                                            isScrollControlled: true,
+                                            context: context,
+                                            builder: (context) =>
+                                                buildSheet())
                                             : null;
                                       }),
                                 ),
@@ -132,10 +150,10 @@ class _MultimrdiaState extends State<Multimedia> {
             onPressed: () {
               isPortrait
                   ? showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) => buildSheet())
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => buildSheet())
                   : null;
             },
             child: const Icon(
@@ -163,16 +181,17 @@ class _MultimrdiaState extends State<Multimedia> {
 
   String randomId() {
     List<String> idList = [
-   "ca-app-pub-3900780607450933/3192254480",
+      "ca-app-pub-3900780607450933/3192254480",
       "/120940746/pub-72844-android-4898"
     ];
-    String randomIndex =
-      idList[Random().nextInt(idList.length)];
+     String randomIndex =
+        (idList..shuffle()).first; 
     print(randomIndex);
     return randomIndex;
   }
 
-  Widget buildSheet() => makeDissmisble(
+  Widget buildSheet() =>
+      makeDissmisble(
         child: DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.3,
@@ -191,14 +210,18 @@ class _MultimrdiaState extends State<Multimedia> {
         ),
       );
 
-  Widget buildContent() => isAldloaded
-      ? Container(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          height: 58,
-          child: AdWidget(ad: _bannerAds!),
-        )
-      : Container(
+  Widget buildContent() =>
+      isAldloaded
+          ? Container(
+        padding:
+        EdgeInsets.only(bottom: MediaQuery
+            .of(context)
+            .viewInsets
+            .bottom),
+        height: 58,
+        child: AdWidget(ad: _bannerAds!),
+      )
+          : Container(
           alignment: Alignment.center,
           height: _bannerAds!.size.height.toDouble(),
           width: _bannerAds!.size.width.toDouble(),

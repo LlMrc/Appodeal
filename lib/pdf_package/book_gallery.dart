@@ -130,18 +130,21 @@ class _DocumentListviewState extends State<DocumentListview> {
                 } else if (data == null) {
                   return Center(child: widgetRequest());
                 } else if (data.isEmpty) {
-                  return Center(
-                    child: SizedBox(
-                      height: 200,
-                      width: 320,
-                      child: Card(
-                        elevation: 4,
-                        child: AnimatedTextKit(animatedTexts: [
-                          FadeAnimatedText('No Files found!😥')
-                        ]),
-                      ),
-                    ),
-                  ); //
+                  return Center(child: widgetRequest());
+                  // return Center(
+                  //   child: Card(
+                  //     elevation: 4,
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.all(10.0),
+                  //       child: AnimatedTextKit(
+                  //           repeatForever: true,
+                  //           animatedTexts: [
+                  //             FadeAnimatedText('No Files found!😥',
+                  //                 textStyle: const TextStyle(fontSize: 24))
+                  //           ]),
+                  //     ),
+                  //   ),
+                  // ); //
                 } else {
                   return Container(
                     height: size.height,
